@@ -3,7 +3,7 @@ var fs = require('fs');
 const router = express.Router();
 const multer = require('multer');
 var io = require('socket.io-client');
-var socket = io.connect('http://localhost:8080', {reconnect: true});
+var socket = io.connect('https://twoway-usersservice.herokuapp.com', {reconnect: true});
 // socket.connect();
 
 var Auth = require('../meddlewares/auth.js');

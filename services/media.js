@@ -48,7 +48,7 @@ router
         fs.readdir(testFolder, (err, files) => {
             var listImage = [];
             files.forEach(file => {
-                var link = 'http://192.168.1.17:8081/static/' + username + '/' + file;
+                var link = 'https://twoway-mediaservice.herokuapp.com/static/' + username + '/' + file;
                 listImage.push({image: link})
             });
             console.log(listImage);
@@ -70,7 +70,7 @@ router
             // socket.emit("/" + name[0], "003021");
             var item = {
                 token: token,
-                urlImage: 'http://192.168.1.17:8081/static/' + name[0] + '/' +  name[1] + '_' + name[2] + '.jpg'
+                urlImage: 'https://twoway-mediaservice.herokuapp.com/static/' + name[0] + '/' +  name[1] + '_' + name[2] + '.jpg'
             }
             socket.emit('serverEvent', item);
             return res.send({succes: false, message: 'save'});

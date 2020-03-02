@@ -134,7 +134,8 @@ router
         //console.log(req.params.id)
         var name =req.params.id.split('.');
         var token = req.body.token || req.query.token || req.headers['authorization'];
-
+        var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
+        
         var urlImage = 'https://twoway-mediaservice.herokuapp.com/static/' + name[0] + '/' +  name[1] + '_' + name[2] + '.jpg'
         var options = {
             host: 'twoway-usersservice.herokuapp.com',

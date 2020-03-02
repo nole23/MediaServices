@@ -3,6 +3,10 @@ var fs = require('fs');
 const router = express.Router();
 const multer = require('multer');
 var io = require('socket.io-client');
+const http = require("http");
+var https = require('https');
+const mediaImpl = require('../servicesImpl/mediaImpl.js');
+
 var socket = io.connect('https://twoway-usersservice.herokuapp.com', {reconnect: true});
 // socket.connect();
 
@@ -42,22 +46,67 @@ router
      * return 500 - List null
      */
     .get('/:id_user', async function(req, res) {
-        var username = req.params.id_user;
-        const testFolder = './public/' + username + '/';
-
-        fs.readdir(testFolder, (err, files) => {
-            var listImage = [];
-            files.forEach(file => {
-                var link = 'https://twoway-mediaservice.herokuapp.com/static/' + username + '/' + file;
-                listImage.push({image: link})
+        var _id = req.params.id_user;
+        var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
+        var token = req.body.token || req.query.token || req.headers['authorization'];
+        var options = {
+            host: 'twoway-usersservice.herokuapp.com',
+            path: '/api/sync/',
+            method: 'GET',
+            headers: {
+                'Access-Control-Allow-Origin':'*',
+                'Content-Type': 'application/json',
+                'authorization': token,
+                'Content-Length': Buffer.byteLength(data)
+            }
+          };
+        var httpreq = https.request(options, function (response) {
+            response.setEncoding('utf8');
+            response.on('data', async function (chunk) {
+                var data = await mediaImpl.getPictureById(JSON.parse(chunk), _id, 20, 0)
+                return res.status(data.status).send({imageLink: data.listImage})
             });
-            console.log(listImage);
-            return res.status(200).send({images: listImage});
         });
-        
+        httpreq.write(data);
+        httpreq.end();
+    })
+    .put('/like', async function(req, res) {
+        var body = req.body;
+        var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
+        var token = req.body.token || req.query.token || req.headers['authorization'];
+        var options = {
+            host: 'twoway-usersservice.herokuapp.com',
+            path: '/api/sync/',
+            method: 'GET',
+            headers: {
+                'Access-Control-Allow-Origin':'*',
+                'Content-Type': 'application/json',
+                'authorization': token,
+                'Content-Length': Buffer.byteLength(data)
+            }
+          };
+        var httpreq = https.request(options, function (response) {
+            response.setEncoding('utf8');
+            response.on('data', async function (chunk) {
+                var data = await mediaImpl.likePicture(JSON.parse(chunk), body);
+                socket.emit('notification', {
+                    friend : JSON.parse(chunk)._id,
+                    me: body.user._id,
+                    type: 'like',
+                    publication: null,
+                    cordinate: null,
+                    image: {
+                        _id_image: data.message._id,
+                        link_image: data.message.link
+                    }});
+                return res.status(data.status).send({message: data.message})
+            });
+        });
+        httpreq.write(data);
+        httpreq.end();
     })
     /**
-     * Funkcia koja cuva sliku
+     * Funkcia koja dodaje profilnu sliku i cuva je
      * upload.single('file'),
      */
     .post('/:id', upload.single('file'), function(req, res) {
@@ -65,13 +114,15 @@ router
         var name =req.params.id.split('.');
         var token = req.body.token || req.query.token || req.headers['authorization'];
         try {
-            // const upload = await firebase.uploadImage(req.file.path, 'public/'+req.file.filename );
-            //console.log(upload)
-            // socket.emit("/" + name[0], "003021");
             var item = {
                 token: token,
                 urlImage: 'https://twoway-mediaservice.herokuapp.com/static/' + name[0] + '/' +  name[1] + '_' + name[2] + '.jpg'
             }
+
+            // Lista blokiranih moze se dodati i prije
+            // cuvanja slike, ostaje za sad posle kao opcija
+            mediaImpl.setImageInDB({_id: name[1], link: item.urlImage});
+
             socket.emit('serverEvent', item);
             return res.send({succes: false, message: 'save'});
         } catch (err) {

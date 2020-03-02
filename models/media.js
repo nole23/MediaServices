@@ -17,7 +17,38 @@ const MediaSchema = new Schema({
         required: true
     },
     listImages: [{
-        type: String
+        link: {
+            type: String
+        },
+        like: [{
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        }],
+        comment: [{
+            user: {
+                type: Schema.Types.ObjectId,
+                ref: 'User'
+            },
+            dateComent: {
+                type: Date,
+                default: Date.now
+            },
+            text: {
+                type: String
+            }
+        }],
+        isShowImage: {
+            type: Boolean,
+            default: true
+        },
+        listBlockUser: [{
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        }],
+        datePublication: {
+            type: Date,
+            default: Date.now
+        }
     }]
 });
 

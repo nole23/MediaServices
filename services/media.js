@@ -130,6 +130,50 @@ router
             return res.send({succes: false, message: 'no save'});
         }
     })
+    .post('/profile-picture/:id', upload.single('file'), function(req, res) {
+        //console.log(req.params.id)
+        var name =req.params.id.split('.');
+        var token = req.body.token || req.query.token || req.headers['authorization'];
+
+        var urlImage = 'https://twoway-mediaservice.herokuapp.com/static/' + name[0] + '/' +  name[1] + '_' + name[2] + '.jpg'
+        var options = {
+            host: 'twoway-usersservice.herokuapp.com',
+            path: '/api/sync/',
+            method: 'GET',
+            headers: {
+                'Access-Control-Allow-Origin':'*',
+                'Content-Type': 'application/json',
+                'authorization': token,
+                'Content-Length': Buffer.byteLength(data)
+            }
+          };
+        var httpreq = https.request(options, function (response) {
+            response.setEncoding('utf8');
+            response.on('data', async function (chunk) {
+                
+                // Ako nisam autorizovan brise se
+
+                // Ako sam autorizovan cuva se u bazu
+                mediaImpl.setImageInDB({_id: name[1], link: urlImage});
+                // Soket koji javlja klijentu
+                socket.emit('publication', {
+                    user_id: name[1],
+                    text: null,
+                    image: urlImage,
+                    datePublish: new Date,
+                    likesCount: null,
+                    likes: null,
+                    comments: null,
+                    address: null,
+                    friends: null
+                })
+
+                return res.status(200).send({message: 'image save'})
+            });
+        });
+        httpreq.write(data);
+        httpreq.end();
+    })
     
 
 module.exports = router;

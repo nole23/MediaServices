@@ -131,7 +131,7 @@ router
             return res.send({succes: false, message: 'no save'});
         }
     })
-    .post('/profile-picture/:id/:', upload.single('file'), function(req, res) {
+    .post('/profile-picture/:id', upload.single('file'), function(req, res) {
         //console.log(req.params.id)
         var name =req.params.id.split('.');
         var token = req.body.token || req.query.token || req.headers['authorization'];

@@ -1,5 +1,7 @@
 var Media = require('../models/media.js');
 var mediaFunction = require('../function/media.js');
+var io = require('socket.io-client');
+var socket = io.connect('https://twoway-usersservice.herokuapp.com', {reconnect: true});
 
 module.exports = {
     getPictureById: async function(me, userForPicture, limit, page) {
@@ -30,33 +32,47 @@ module.exports = {
                 return {status: 404, message: 'server error'};
             })
     },
-    setImageInDB: function(data) {
+    setImageInDB: async function(data) {
         Media.findOne({user_id: data._id})
             .exec()
             .then((userMedia) => {
+                var item = null;
+
                 if (userMedia === null) {
                 var newMedia = new Media();
                 newMedia.user_id = data._id;
                 newMedia.listImages.push({
                     link: data.link,
-                    like: [],
-                    comment: [],
                     isShowImage: true,
                     listBlockUser: []
                 });
                 
                 newMedia.save();
+                item = newMedia.listImages[userMedia.listImages.length - 1]['_id'];
                 } else {
                     userMedia.listImages.push({
                         link: data.link,
-                        like: [],
-                        comment: [],
                         isShowImage: true,
                         listBlockUser: []
                     });
 
                     userMedia.save();
+                    item = userMedia.listImages[userMedia.listImages.length - 1]['_id'];
                 }
+
+                socket.emit(data.type.toString(), {
+                    user_id: null,
+                    text: null,
+                    image: null,
+                    datePublish: new Date,
+                    likesCount: null,
+                    likes: null,
+                    comments: null,
+                    address: null,
+                    friends: null,
+                    type: 'picture',
+                    img_id: item
+                })
             })
             .catch((err) => {
                 console.log('server ne radi nesto')

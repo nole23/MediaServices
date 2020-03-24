@@ -122,9 +122,7 @@ router
 
             // Lista blokiranih moze se dodati i prije
             // cuvanja slike, ostaje za sad posle kao opcija
-            mediaImpl.setImageInDB({_id: name[1], link: item.urlImage});
-
-            socket.emit('serverEvent', item);
+            mediaImpl.setImageInDB({_id: name[1], link: item.urlImage, type: 'serverEvent'});
             return res.send({succes: false, message: 'save'});
         } catch (err) {
             // console.log(err);
@@ -152,25 +150,8 @@ router
         var httpreq = https.request(options, function (response) {
             response.setEncoding('utf8');
             response.on('data', async function (chunk) {
-                
-                // Ako nisam autorizovan brise se
 
-                // Ako sam autorizovan cuva se u bazu
-                mediaImpl.setImageInDB({_id: name[1], link: urlImage});
-                // Soket koji javlja klijentu
-                socket.emit('publication', {
-                    user_id: name[1],
-                    text: null,
-                    image: urlImage,
-                    datePublish: new Date,
-                    likesCount: null,
-                    likes: null,
-                    comments: null,
-                    address: null,
-                    friends: null,
-                    type: 'picture'
-                })
-
+                mediaImpl.setImageInDB({_id: name[1], link: urlImage, type: 'publication'});
                 return res.status(200).send({message: 'image save'})
             });
         });

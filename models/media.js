@@ -20,23 +20,6 @@ const MediaSchema = new Schema({
         link: {
             type: String
         },
-        like: [{
-            type: Schema.Types.ObjectId,
-            ref: 'User'
-        }],
-        comment: [{
-            user: {
-                type: Schema.Types.ObjectId,
-                ref: 'User'
-            },
-            dateComent: {
-                type: Date,
-                default: Date.now
-            },
-            text: {
-                type: String
-            }
-        }],
         isShowImage: {
             type: Boolean,
             default: true

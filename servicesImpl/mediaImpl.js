@@ -5,7 +5,7 @@ var socket = io.connect('http://localhost:8080', {reconnect: true});
 
 module.exports = {
     getPictureById: async function(me, userForPicture, limit, page) {
-        return Media.findOne({user_id: userForPicture, 'listImages.isShowImage': {$ne: false}}, { listImages: { "$slice": [ 0, 5 ] }})
+        return Media.findOne({user_id: userForPicture, 'listImages.isShowImage': {$ne: false}})
             .exec()
             .then((images) => {
                 var listImage = [];

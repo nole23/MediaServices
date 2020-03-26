@@ -16,23 +16,21 @@ const MediaSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true
     },
-    listImages: [{
-        link: {
-            type: String
-        },
-        isShowImage: {
-            type: Boolean,
-            default: true
-        },
-        listBlockUser: [{
-            type: Schema.Types.ObjectId,
-            ref: 'User'
-        }],
-        datePublication: {
-            type: Date,
-            default: Date.now
-        }
-    }]
+    link: {
+        type: String
+    },
+    isShowImage: {
+        type: Boolean,
+        default: true
+    },
+    listBlockUser: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    datePublication: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 module.exports = mongoose.model('Media', MediaSchema);

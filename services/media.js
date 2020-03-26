@@ -48,7 +48,8 @@ router
         var _id = req.params.id_user;
         var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
         var token = req.body.token || req.query.token || req.headers['authorization'];
-
+        var limit = req.body;
+        console.log(limit)
         var options = {
             host: 'twoway-usersservice.herokuapp.com',
             path: '/api/sync/',
@@ -66,41 +67,6 @@ router
             response.on('data', async function (chunk) {
                 var data = await mediaImpl.getPictureById(JSON.parse(chunk), _id, 20, 0)
                 return res.status(data.status).send({imageLink: data.listImage})
-            });
-        });
-        httpreq.write(data);
-        httpreq.end();
-    })
-    .put('/like', async function(req, res) {
-        var body = req.body;
-        var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
-        var token = req.body.token || req.query.token || req.headers['authorization'];
-        var options = {
-            host: 'twoway-usersservice.herokuapp.com',
-            path: '/api/sync/',
-            method: 'GET',
-            headers: {
-                'Access-Control-Allow-Origin':'*',
-                'Content-Type': 'application/json',
-                'authorization': token,
-                'Content-Length': Buffer.byteLength(data)
-            }
-          };
-        var httpreq = https.request(options, function (response) {
-            response.setEncoding('utf8');
-            response.on('data', async function (chunk) {
-                var data = await mediaImpl.likePicture(JSON.parse(chunk), body);
-                socket.emit('notification', {
-                    friend : JSON.parse(chunk)._id,
-                    me: body.user._id,
-                    type: 'like',
-                    publication: null,
-                    cordinate: null,
-                    image: {
-                        _id_image: data.message._id,
-                        link_image: data.message.link
-                    }});
-                return res.status(data.status).send({message: data.message})
             });
         });
         httpreq.write(data);

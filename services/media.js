@@ -36,7 +36,7 @@ var upload = multer({ storage: storage });
 
 router
     .get('/', function(req, res) {
-        return res.status(200).send({message: 'radi'})
+        return res.status(200).send({message: 'radi', socket: 'SOCKET_NULL_POINT'})
     })
     /**
      * Get all images by user id
@@ -66,7 +66,7 @@ router
             response.setEncoding('utf8');
             response.on('data', async function (chunk) {
                 var data = await mediaImpl.getPictureById(JSON.parse(chunk), _id, 20, 0)
-                return res.status(data.status).send({imageLink: data.listImage})
+                return res.status(data.status).send({imageLink: data.listImage, socket: 'SOCKET_NULL_POINT'})
             });
         });
         httpreq.write(data);
@@ -89,9 +89,9 @@ router
             // Lista blokiranih moze se dodati i prije
             // cuvanja slike, ostaje za sad posle kao opcija
             mediaImpl.setImageInDB({_id: name[1], link: item.urlImage, type: 'imageProfil'});
-            return res.send({succes: false, message: 'save'});
+            return res.send({succes: false, message: 'save', socket: 'SOCKET_NULL_POINT'});
         } catch (err) {
-            return res.send({succes: false, message: 'no save'});
+            return res.send({succes: false, message: 'no save', socket: 'SOCKET_NULL_POINT'});
         }
     })
     .post('/profile-picture/:id/:text', upload.single('file'), function(req, res) {
@@ -123,7 +123,7 @@ router
                 response.setEncoding('utf8');
                 response.on('data', async function (chunk) {
                     mediaImpl.setImageInDB({_id: name[1], link: item.urlImage, type: 'imagePublic', text: text});
-                    return res.status(200).send({message: 'image save'})
+                    return res.status(200).send({message: 'image save', socket: 'SOCKET_NULL_POINT'})
                 });
             });
             httpreq.write(data);

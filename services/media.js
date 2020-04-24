@@ -49,7 +49,6 @@ router
         var data = JSON.stringify({email: 'nole0223@gmail.com', password: '123'})
         var token = req.body.token || req.query.token || req.headers['authorization'];
         var limit = req.body;
-        console.log(limit)
         var options = {
             host: 'twoway-usersservice.herokuapp.com',
             path: '/api/sync/',

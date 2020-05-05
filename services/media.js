@@ -102,7 +102,7 @@ router
             var httpreq = http.request(options, async function (response, error) {
                 response.setEncoding('utf8');
                 response.on('data', async function (chunk) {
-                    mediaImpl.setImageInDB({_id: name[1], link: item.urlImage, type: 'imageProfil', text: null});
+                    mediaImpl.setImageInDB({_id: name[1], link: item.link, type: 'imageProfil', text: null});
                     return res.status(200).send({message: 'SUCCESS_SAVE_ADD', socket: 'SOCKET_NULL_POINT'})
                 });
             });
@@ -144,7 +144,7 @@ router
             var httpreq = http.request(options, async function (response, error) {
                 response.setEncoding('utf8');
                 response.on('data', async function (chunk) {
-                    mediaImpl.setImageInDB({_id: name[1], link: item.urlImage, type: 'imagePublic', text: text});
+                    mediaImpl.setImageInDB({_id: name[1], link: item.link, type: 'imagePublic', text: text});
                     return res.status(200).send({message: chunk, socket: 'SOCKET_NULL_POINT'})
                 });
             });

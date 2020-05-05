@@ -1,7 +1,5 @@
 var Media = require('../models/media.js');
 var mediaFunction = require('../function/media.js');
-var io = require('socket.io-client');
-var socket = io.connect('https://twoway-usersservice.herokuapp.com', {reconnect: true});
 
 module.exports = {
     getPictureById: async function(me, userForPicture, limit, page) {
@@ -31,19 +29,5 @@ module.exports = {
         newMedia.datePublication = new Date
         
         newMedia.save();
-        
-        socket.emit(data.type.toString(), {
-            user_id: data['_id'],
-            text: data['text'],
-            image: data['link'],
-            datePublish: newMedia.datePublication,
-            likesCount: null,
-            likes: null,
-            comments: null,
-            address: null,
-            friends: null,
-            type: 'imagePublic',
-            img_id: newMedia._id
-        })
     }
 }

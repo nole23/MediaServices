@@ -145,7 +145,7 @@ router
                 response.setEncoding('utf8');
                 response.on('data', async function (chunk) {
                     mediaImpl.setImageInDB({_id: name[1], link: item.link, type: 'imagePublic', text: text});
-                    return res.status(200).send({message: chunk, socket: 'SOCKET_NULL_POINT'})
+                    return res.status(200).send({message: JSON.parse(chunk).message, socket: 'SOCKET_NULL_POINT'})
                 });
             });
             httpreq.write(data);

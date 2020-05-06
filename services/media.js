@@ -73,14 +73,17 @@ router
      * Funkcia koja dodaje profilnu sliku i cuva je
      * upload.single('file'),
      */
-    .post('/:id', upload.single('file'), function(req, res) {
+    .post('/:id', upload.single('file'), async function(req, res) {
         var name = req.params.id.split('.');
         var token = req.body.token || req.query.token || req.headers['authorization'];
+
+        var newMedia = await mediaImpl.setImageInDB({_id: name[1], link: item.link, type: 'imageProfil', text: null});
 
         var item = {
             link: 'https://twoway-mediaservice.herokuapp.com/static/' + name[0] + '/' +  name[1] + '_' + name[2] + '.jpg',
             type: 'imageProfil',
-            text: null
+            text: null,
+            _id: newMedia._id
         }
         var data = JSON.stringify(item)
         try {
@@ -102,8 +105,11 @@ router
             var httpreq = http.request(options, async function (response, error) {
                 response.setEncoding('utf8');
                 response.on('data', async function (chunk) {
-                    mediaImpl.setImageInDB({_id: name[1], link: item.link, type: 'imageProfil', text: null});
-                    return res.status(200).send({message: 'SUCCESS_SAVE_ADD', socket: 'SOCKET_NULL_POINT'})
+                    
+                    return res.status(200).send({
+                        message: JSON.parse(chunk)['message'],  
+                        socket: 'SOCKET_NULL_POINT'
+                    })
                 });
             });
             httpreq.write(data);
@@ -116,16 +122,19 @@ router
         var token = req.body.token || req.query.token || req.headers['authorization'];
         var text = req.params.text;
 
+        var newMedia = await mediaImpl.setImageInDB({_id: name[1], link: item.link, type: 'imagePublic', text: text});
+
         var name = req.params.id.split('.');
         var item = {
             link: 'https://twoway-mediaservice.herokuapp.com/static/' + name[0] + '/' +  name[1] + '_' + name[2] + '.jpg',
             type: 'imagePublic',
-            text: text
+            text: text,
+            _id: newMedia._id
         }
 
         var data = JSON.stringify(item)
         try {
-            
+            // twoway-usersservice.herokuapp.com
             var options = {
                 host: 'twoway-usersservice.herokuapp.com',
                 path: '/api/publication/add-publication',
@@ -144,8 +153,12 @@ router
             var httpreq = http.request(options, async function (response, error) {
                 response.setEncoding('utf8');
                 response.on('data', async function (chunk) {
-                    mediaImpl.setImageInDB({_id: name[1], link: item.link, type: 'imagePublic', text: text});
-                    return res.status(200).send({message: JSON.parse(chunk).message, socket: 'SOCKET_NULL_POINT'})
+                    
+                    return res.status(200).send({
+                        message: JSON.parse(chunk)['message'],
+                        media: newMedia, 
+                        socket: 'SOCKET_NULL_POINT'
+                    })
                 });
             });
             httpreq.write(data);

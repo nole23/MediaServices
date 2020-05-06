@@ -29,5 +29,7 @@ module.exports = {
         newMedia.datePublication = new Date
         
         newMedia.save();
+
+        return newMedia;
     }
 }
